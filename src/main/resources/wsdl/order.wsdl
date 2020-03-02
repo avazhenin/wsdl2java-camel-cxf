@@ -1,0 +1,55 @@
+<wsdl:definitions targetNamespace="http://order.camelinaction"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://order.camelinaction"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+
+>
+    <wsdl:types>
+        <xs:schema targetNamespace="http://order.camelinaction">
+            <xs:element type="xs:string" name="partName"/>
+            <xs:element type="xs:int" name="amount"/>
+            <xs:element type="xs:string" name="customerName"/>
+            <xs:element type="xs:string" name="resultCode"/>
+        </xs:schema>
+    </wsdl:types>
+
+    <wsdl:message name="purchaseOrder">
+        <wsdl:part name="partName" element="tns:partName"/>
+        <wsdl:part name="amount" element="tns:amount"/>
+        <wsdl:part name="customerName" element="tns:customerName"/>
+    </wsdl:message>
+    <wsdl:message name="orderResult">
+        <wsdl:part name="resultCode" element="tns:resultCode"/>
+    </wsdl:message>
+
+    <wsdl:portType name="orderInterface">
+        <wsdl:operation name="order">
+            <wsdl:input message="tns:purchaseOrder"/>
+            <wsdl:output message="tns:orderResult"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="orderServiceBinding" type="tns:orderInterface">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="order">
+            <soap:operation soapAction="http://order.camelinaction" style="document"/>
+            <wsdl:input>
+                <soap:body parts="partName" use="literal"/>
+                <soap:body parts="amount" use="literal"/>
+                <soap:body parts="customerName" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body parts="resultCode" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="orderService">
+        <wsdl:port name="orderServicePort" binding="tns:orderServiceBinding">
+            <soap:address location="/orderservice"/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

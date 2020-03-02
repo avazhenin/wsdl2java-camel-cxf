@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core"
+           xmlns:camelcxf="http://camel.apache.org/schema/blueprint/cxf"
+           xsi:schemaLocation="
+             http://www.osgi.org/xmlns/blueprint/v1.0.0 https://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+             http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
+
+    <bean id="loggerManager" class="com.cxf.test.Logger.LoggerManager" factory-method="getLogger">
+        <argument value="myLogger"/>
+    </bean>
+
+    <bean id="helloBean" class="com.cxf.test.Beans.HelloBean">
+        <property name="log" ref="loggerManager"/>
+    </bean>
+
+    <bean id="helloProcessor" class="com.cxf.test.Processors.HelloProcessor">
+        <property name="log" ref="loggerManager"/>
+    </bean>
+
+    <camelcxf:cxfEndpoint
+            id="cxfOrderEndpointService"
+            wsdlURL="wsdl/order.wsdl"
+            xmlns:s="http://order.camelinaction"
+            address="/orderservice"
+            serviceClass="camelinaction.order.OrderInterface"
+            endpointName="s:orderServicePort"
+            serviceName="s:orderService"/>
+
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/blueprint">
+        <route>
+            <from uri="cxf:bean:cxfOrderEndpointService"/>
+            <log message="hello from OrderEndpointService"/>
+            <to uri="bean:helloBean?method=Hello"/>
+            <to uri="bean:helloBean?method=Bye"/>
+            <process ref="helloProcessor"/>
+        </route>
+    </camelContext>
+
+</blueprint>
